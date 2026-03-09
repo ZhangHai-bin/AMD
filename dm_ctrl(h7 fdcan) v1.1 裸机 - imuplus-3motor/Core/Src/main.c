@@ -61,15 +61,14 @@ volatile float Motor_Show_Pos[4]    = {0.0f};
 
 // --- 参数设置 (数组化，方便三轴独立调试) ---
 // 建议调试顺序：先调X，把Y/Z的KP设为0；然后调Y...
-double Kp_Vib[3] = {0, -0.1, 0}; // 三轴抑振力度0.1 0.1 0.1
+double Kp_Vib[3] = {0, 0.05, 0}; // 三轴抑振力度0.1 0.1 0.1
 double Kv_damp[3] = {0.0f,0.005f,0.0f};//三轴抑振速度阻尼
 
 // 软限位范围 (虚拟墙开始介入的位置)
 const float SOFT_LIMIT_RAD[3] = {1.0f, 1.5f, 1.0f}; 
 
 // 虚拟墙参数
-const float WALL_K_SPRING[3]  = {0.05f, 0.05f, 0.05f};//{0.05f, 0.05f, 0.05f}  
-const float WALL_K_DAMP[3]    = {0.01f, 0.05f, 0.01f};//{0.01f, 0.01f, 0.01f}
+const float WALL_K_SPRING[3]  = {0.05f, 0.005f, 0.05f};//{0.05f, 0.05f, 0.05f}  
 
 // 物理最大力矩保护
 const float MAX_TORQUE = 1.0f;   
@@ -311,16 +310,28 @@ int main(void)
         
         // --- C. 虚拟墙力矩 ---
         float tor_wall = 0.0f;
+       if (cur_pos > 0) 
+        {
+            float depth = cur_pos;
+            tor_wall = -1.0f * (WALL_K_SPRING[i] * depth);
+        }
+        else if (cur_pos < 0) 
+        {
+            float depth = cur_pos; 
+            tor_wall = -1.0f * (WALL_K_SPRING[i] * depth);
+        }
+        /*
         if (cur_pos > SOFT_LIMIT_RAD[i]) 
         {
             float depth = cur_pos - SOFT_LIMIT_RAD[i];
-            tor_wall = -1.0f * (WALL_K_SPRING[i] * depth + WALL_K_DAMP[i] * cur_vel);
+            tor_wall = -1.0f * (WALL_K_SPRING[i] * depth);
         }
         else if (cur_pos < -SOFT_LIMIT_RAD[i]) 
         {
             float depth = cur_pos - (-SOFT_LIMIT_RAD[i]); 
-            tor_wall = -1.0f * (WALL_K_SPRING[i] * depth + WALL_K_DAMP[i] * cur_vel);
+            tor_wall = -1.0f * (WALL_K_SPRING[i] * depth);
         }
+         */
         
         // --- D. 合成 ---
         tor_final = tor_vib + tor_damp + tor_wall ;
@@ -347,9 +358,9 @@ int main(void)
         char print_buf[128];
 sprintf(print_buf, 
         "=== 三轴完整数据 ===\r\n"
-        "X轴: Pos=%.3f | Zero=%.3f | Show=%.3f | Tor=%.3f | Acc=%.3f\r\n"
-        "Y轴: Pos=%.3f | Zero=%.3f | Show=%.3f | Tor=%.3f | Acc=%.3f\r\n"
-        "Z轴: Pos=%.3f | Zero=%.3f | Show=%.3f | Tor=%.3f | Acc=%.3f\r\n"
+        "X轴: Pos=%.3f | Zero=%.3f | Show_cur=%.3f | Tor=%.3f | Acc=%.3f\r\n"
+        "Y轴: Pos=%.3f | Zero=%.3f | Show_cur=%.3f | Tor=%.3f | Acc=%.3f\r\n"
+        "Z轴: Pos=%.3f | Zero=%.3f | Show_cur=%.3f | Tor=%.3f | Acc=%.3f\r\n"
         "=====================\r\n",
         // X轴
         motor[Motor1].para.pos, Motor_Zero_Offset[Motor1], Motor_Show_Pos[Motor1],

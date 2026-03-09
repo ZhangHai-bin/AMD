@@ -61,14 +61,14 @@ volatile float Motor_Show_Pos[4]    = {0.0f};
 
 // --- 参数设置 (数组化，方便三轴独立调试) ---
 // 建议调试顺序：先调X，把Y/Z的KP设为0；然后调Y...
-double Kp_Vib[3] = {0, 0.05, 0}; // 三轴抑振力度0.1 0.1 0.1
-double Kv_damp[3] = {0.0f,0.005f,0.0f};//三轴抑振速度阻尼
+double Kp_Vib[3] = {0, 0.07, 0}; // 三轴抑振力度0 0.05 0
+double Kv_damp[3] = {0.0f,0.005f,0.0f};//三轴抑振速度阻尼0 0.005 0
 
 // 软限位范围 (虚拟墙开始介入的位置)
 const float SOFT_LIMIT_RAD[3] = {1.0f, 1.5f, 1.0f}; 
 
 // 虚拟墙参数
-const float WALL_K_SPRING[3]  = {0.05f, 0.005f, 0.05f};//{0.05f, 0.05f, 0.05f}  
+const float WALL_K_SPRING[3]  = {0.05f, 0.01f, 0.05f};//{0.05f, 0.005f, 0.05f}  
 
 // 物理最大力矩保护
 const float MAX_TORQUE = 1.0f;   

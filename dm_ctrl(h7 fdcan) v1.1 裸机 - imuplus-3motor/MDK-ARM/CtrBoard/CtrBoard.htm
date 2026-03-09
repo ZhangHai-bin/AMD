@@ -3,9 +3,9 @@
 <title>Static Call Graph - [CtrBoard\CtrBoard.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image CtrBoard\CtrBoard.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Sun Mar 08 15:48:50 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Mon Mar 09 15:25:32 2026
 <BR><P>
-<H3>Maximum Stack Usage =        624 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =        720 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
 main &rArr; bsp_fdcan_set_baud &rArr; HAL_FDCAN_Init &rArr; HAL_FDCAN_MspInit &rArr; HAL_RCCEx_PeriphCLKConfig &rArr; RCCEx_PLL3_Config
 <P>
@@ -902,9 +902,9 @@ Global Symbols
 <LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_FDCAN_ClockCalibrationCallback
 <LI><a href="#[c2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_FDCAN_ErrorStatusCallback
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FDCAN1_IT1_IRQHandler
-<LI><a href="#[1d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FDCAN1_IT0_IRQHandler
+<BR>[Called By]<UL><LI><a href="#[1d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FDCAN1_IT0_IRQHandler
 <LI><a href="#[48]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FDCAN_CAL_IRQHandler
+<LI><a href="#[1f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FDCAN1_IT1_IRQHandler
 </UL>
 
 <P><STRONG><a name="[c8]"></a>HAL_FDCAN_Init</STRONG> (Thumb, 572 bytes, Stack size 104 bytes, stm32h7xx_hal_fdcan.o(i.HAL_FDCAN_Init))
@@ -1797,8 +1797,8 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[134]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mit_ctrl
 </UL>
 
-<P><STRONG><a name="[93]"></a>main</STRONG> (Thumb, 714 bytes, Stack size 184 bytes, main.o(i.main))
-<BR><BR>[Stack]<UL><LI>Max Depth = 624<LI>Call Chain = main &rArr; bsp_fdcan_set_baud &rArr; HAL_FDCAN_Init &rArr; HAL_FDCAN_MspInit &rArr; HAL_RCCEx_PeriphCLKConfig &rArr; RCCEx_PLL3_Config
+<P><STRONG><a name="[93]"></a>main</STRONG> (Thumb, 864 bytes, Stack size 280 bytes, main.o(i.main))
+<BR><BR>[Stack]<UL><LI>Max Depth = 720<LI>Call Chain = main &rArr; bsp_fdcan_set_baud &rArr; HAL_FDCAN_Init &rArr; HAL_FDCAN_MspInit &rArr; HAL_RCCEx_PeriphCLKConfig &rArr; RCCEx_PLL3_Config
 </UL>
 <BR>[Calls]<UL><LI><a href="#[13a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dm_motor_init
 <LI><a href="#[137]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dm_motor_enable

@@ -315,8 +315,8 @@ int main(void)
             // 超过限位：力矩设0，改为弱位置闭环锁住零点（防止乱飘）
             tor_final = 0.0f;
             motor[i].ctrl.pos_set = Motor_Zero_Offset[i]; // 目标回零
-            motor[i].ctrl.kp_set  = 0.05f; // 很软的弹簧
-            motor[i].ctrl.kd_set  = 0.01f; // 很小的阻尼
+            motor[i].ctrl.kp_set  = 0.05f; // 很软的弹簧 0.05f
+            motor[i].ctrl.kd_set  = 0.01f; // 很小的阻尼 0.01f
         }
         else
         {
@@ -370,11 +370,21 @@ int main(void)
     {
         update_counter = 0;
         char print_buf[128];
-        // 打印 X轴加速度 和 X轴电机力矩 (作参考)
-        sprintf(print_buf, "AccX:%.2f TorX:%.2f PosX:%.2f\r\n", 
-                linear_acc[0], 
-                motor[Motor1].ctrl.tor_set,
-                Motor_Show_Pos[Motor1]);
+sprintf(print_buf, 
+        "=== 三轴完整数据 ===\r\n"
+        "X轴: Pos=%.3f | Zero=%.3f | Show=%.3f | Tor=%.3f | Acc=%.3f\r\n"
+        "Y轴: Pos=%.3f | Zero=%.3f | Show=%.3f | Tor=%.3f | Acc=%.3f\r\n"
+        "Z轴: Pos=%.3f | Zero=%.3f | Show=%.3f | Tor=%.3f | Acc=%.3f\r\n"
+        "=====================\r\n",
+        // X轴
+        motor[Motor1].para.pos, Motor_Zero_Offset[Motor1], Motor_Show_Pos[Motor1],
+        motor[Motor1].ctrl.tor_set, linear_acc[0],
+        // Y轴
+        motor[Motor2].para.pos, Motor_Zero_Offset[Motor2], Motor_Show_Pos[Motor2],
+        motor[Motor2].ctrl.tor_set, linear_acc[1],
+        // Z轴
+        motor[Motor3].para.pos, Motor_Zero_Offset[Motor3], Motor_Show_Pos[Motor3],
+        motor[Motor3].ctrl.tor_set, linear_acc[2]);
         
         HAL_UART_Transmit(&huart10, (uint8_t*)print_buf, strlen(print_buf), 50);
     }     

@@ -64,15 +64,12 @@ volatile float Motor_Show_Pos[4]    = {0.0f};
 double Kp_Vib[3] = {0, -0.1, 0}; // 三轴抑振力度0.1 0.1 0.1
 double Kv_damp[3] = {0.0f,0.005f,0.0f};//三轴抑振速度阻尼
 
-// 硬限位范围 (超过这个值，电机进入弱位置模式)
-double STOP_LIMIT_RAD[3] = {1.5f, 2.5f, 1.5f}; //1.5f 1.5f 1.5f
-
 // 软限位范围 (虚拟墙开始介入的位置)
-const float SOFT_LIMIT_RAD[3] = {1.0f, 2.0f, 1.0f}; 
+const float SOFT_LIMIT_RAD[3] = {1.0f, 1.5f, 1.0f}; 
 
 // 虚拟墙参数
-const float WALL_K_SPRING[3]  = {0.05f, 0.05f, 0.05f};  
-const float WALL_K_DAMP[3]    = {0.01f, 0.01f, 0.01f};  
+const float WALL_K_SPRING[3]  = {0.05f, 0.05f, 0.05f};//{0.05f, 0.05f, 0.05f}  
+const float WALL_K_DAMP[3]    = {0.01f, 0.05f, 0.01f};//{0.01f, 0.01f, 0.01f}
 
 // 物理最大力矩保护
 const float MAX_TORQUE = 1.0f;   
@@ -308,29 +305,7 @@ int main(void)
         float cur_pos = Motor_Show_Pos[i];
         float cur_vel = motor[i].para.vel;
         float tor_final = 0.0f;
-        
-        // --- A. 硬限位保护 (超过 STOP_LIMIT 进入弱位置模式) ---
-        if (cur_pos > STOP_LIMIT_RAD[i] || cur_pos < -STOP_LIMIT_RAD[i])
-        {
-            // 超过限位：力矩设0，改为弱位置闭环锁住零点（防止乱飘）
-            tor_final = 0.0f;
-            motor[i].ctrl.pos_set = Motor_Zero_Offset[i]; // 目标回零
-            motor[i].ctrl.kp_set  = 0.05f; // 很软的弹簧 0.05f
-            motor[i].ctrl.kd_set  = 0.01f; // 很小的阻尼 0.01f
-        }
-        else
-        {
-            // 正常范围内：力矩模式，清除位置参数
-            motor[i].ctrl.pos_set = 0.0f;
-            motor[i].ctrl.kp_set  = 0.0f;
-            motor[i].ctrl.kd_set  = 0.0f;
 
-        }
-            
-        // --- B. 抑振力矩 ---
-        // linear_acc[0] -> Motor1 (X)
-        // linear_acc[1] -> Motor2 (Y)
-        // linear_acc[2] -> Motor3 (Z)
         float tor_vib = Kp_Vib[i] * linear_acc[i];
         float tor_damp = -Kv_damp[i] * cur_vel;
         
@@ -348,7 +323,7 @@ int main(void)
         }
         
         // --- D. 合成 ---
-        tor_final = tor_vib + tor_wall + tor_damp;
+        tor_final = tor_vib + tor_damp + tor_wall ;
         
         // --- E. 限幅 ---
         if (tor_final > MAX_TORQUE)  tor_final = MAX_TORQUE;

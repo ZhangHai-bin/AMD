@@ -52,6 +52,8 @@ volatile float linear_acc[3]; // 纯运动加速度 (去除重力)
 
 // 计数器
 volatile uint32_t update_counter = 0;
+uint32_t print_index = 0;
+
 
 // --- 多电机管理数组 ---
 // 下标0->Motor1(X), 下标1->Motor2(Y), 下标2->Motor3(Z)
@@ -351,11 +353,27 @@ int main(void)
     }
             // 每个电机发完歇 1ms，防止 CAN 拥堵
         HAL_Delay(1); 
+	/************用来打印加速度的***************
+    if (update_counter >= 3) 
+    {
+            update_counter = 0;
+
+            char print_buf[64];
+
+            sprintf(print_buf,"%lu,%.6f\r\n", print_index++, linear_acc[1]);
+
+            HAL_UART_Transmit(&huart10, (uint8_t*)print_buf, strlen(print_buf), 50);
+    }
+    *************************************/
+
+
+/**********************调试用的打印***************
     // --- 打印逻辑 (略微降频，只打印 Motor1 和 Acc 作参考，防止刷屏太快) ---
     if (update_counter >= 10) 
     {
         update_counter = 0;
         char print_buf[128];
+			
 sprintf(print_buf, 
         "=== 三轴完整数据 ===\r\n"
         "X轴: Pos=%.3f | Zero=%.3f | Show_cur=%.3f | Tor=%.3f | Acc=%.3f\r\n"
@@ -373,7 +391,9 @@ sprintf(print_buf,
         motor[Motor3].ctrl.tor_set, linear_acc[2]);
         
         HAL_UART_Transmit(&huart10, (uint8_t*)print_buf, strlen(print_buf), 50);
-    }     
+			
+    } 
+************************/    
       
   }
   /* USER CODE END 3 */

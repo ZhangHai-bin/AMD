@@ -49,11 +49,17 @@ uint8_t rx_cnt = 0;         // 计数
 volatile float acc[3];        // 原始加速度 (含重力)
 volatile float angle[3];      // 角度 (Roll, Pitch, Yaw)
 volatile float linear_acc[3]; // 纯运动加速度 (去除重力)
+volatile float linear_acc_filt[3] = {0.0f};
+volatile float residual_acc[3]    = {0.0f};
 
 // 计数器
 volatile uint32_t update_counter = 0;
 uint32_t print_index = 0;
 
+// 加速度滤波系数：越小越平滑
+const float ACC_ALPHA[3] = {0.0f, 0.0f, 0.50f};
+// 残余振动记忆系数：越接近1，记忆越久
+const float RES_ALPHA[3] = {0.0f, 0.0f, 0.5f};
 
 // --- 多电机管理数组 ---
 // 下标0->Motor1(X), 下标1->Motor2(Y), 下标2->Motor3(Z)
@@ -63,14 +69,16 @@ volatile float Motor_Show_Pos[4]    = {0.0f};
 
 // --- 参数设置 (数组化，方便三轴独立调试) ---
 // 建议调试顺序：先调X，把Y/Z的KP设为0；然后调Y...
-double Kp_Vib[3] = {-0.07, -0.07, -0.07}; // 三轴抑振力度 double Kp_Vib[3] = {0, -0.07, -0.07};
-double Kv_damp[3] = {0.005f,0.005f,0.005f};//三轴抑振速度阻尼 double Kv_damp[3] = {0.0f,0.005f,0.005f}
+double Kp_Vib[3] = {0, 0, -0.06}; // 三轴抑振力度 double Kp_Vib[3] = {-0.07, -0.07, -0.07};
+double Kv_damp[3] = {0.0,0.0,0.002f};//double Kv_damp[3] = {0.005f,0.005f,0.005f};
+double Kr_Res[3]     = {0.0, 0.0, -0.03};   // 残余振动项-0.08
+float kr_acc_start = 0.5f;
 
-// 软限位范围 (虚拟墙开始介入的位置)
-const float SOFT_LIMIT_RAD[3] = {1.5f, 1.5f, 1.5f}; //const float SOFT_LIMIT_RAD[3] = {1.0f, 1.5f, 1.0f};
+	// 软限位范围 (虚拟墙开始介入的位置)
+const float SOFT_LIMIT_RAD[3] = {1.5f, 1.5f, 1.5f}; //const float SOFT_LIMIT_RAD[3] = {1.5f, 1.5f, 1.5f};
 
 // 虚拟墙参数
-const float WALL_K_SPRING[3]  = {0.03f, 0.01f, 0.01f};//const float WALL_K_SPRING[3]  = {0.05f, 0.01f, 0.05f}
+const float WALL_K_SPRING[3]  = {0.00f, 0.00f, 0.00f};//const float WALL_K_SPRING[3]  = {0.03f, 0.01f, 0.01f};
 
 // 物理最大力矩保护
 const float MAX_TORQUE = 1.0f;   
@@ -295,24 +303,42 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    
+        
+
     // ============================================
     // === 循环处理 3 个轴 (i=0:X, i=1:Y, i=2:Z) ===
     // ============================================
     for (int i = 0; i < 3; i++)
     {
+        // 当前加速度低通
+        linear_acc_filt[i] = ACC_ALPHA[i] * linear_acc[i]
+                        + (1.0f - ACC_ALPHA[i]) * linear_acc_filt[i];
+
+        // 残余振动状态（慢衰减记忆）
+        residual_acc[i] = RES_ALPHA[i] * residual_acc[i]
+                        + (1.0f - RES_ALPHA[i]) * linear_acc_filt[i];
+
+
         Motor_Show_Pos[i] = motor[i].para.pos - Motor_Zero_Offset[i];
         
         float cur_pos = Motor_Show_Pos[i];
         float cur_vel = motor[i].para.vel;
         float tor_final = 0.0f;
 
-        float tor_vib = Kp_Vib[i] * linear_acc[i];
-        float tor_damp = -Kv_damp[i] * cur_vel;
+        float tor_vib = Kp_Vib[i] * linear_acc[i];// 当前快速响应
+        float tor_damp = -Kv_damp[i] * cur_vel;// 电机质量块自身阻尼
         
+        float tor_res = 0.0f;
+			
+        if (fabsf(linear_acc_filt[i]) < kr_acc_start)
+        {
+            tor_res = Kr_Res[i] * residual_acc[i];    
+        }
+
         // --- C. 虚拟墙力矩 ---
         float tor_wall = 0.0f;
-       if (cur_pos > 0) 
+       /*
+        if (cur_pos > 0) 
         {
             float depth = cur_pos;
             tor_wall = -1.0f * (WALL_K_SPRING[i] * depth);
@@ -322,7 +348,8 @@ int main(void)
             float depth = cur_pos; 
             tor_wall = -1.0f * (WALL_K_SPRING[i] * depth);
         }
-        /*
+         */
+        
         if (cur_pos > SOFT_LIMIT_RAD[i]) 
         {
             float depth = cur_pos - SOFT_LIMIT_RAD[i];
@@ -333,10 +360,10 @@ int main(void)
             float depth = cur_pos - (-SOFT_LIMIT_RAD[i]); 
             tor_wall = -1.0f * (WALL_K_SPRING[i] * depth);
         }
-         */
+         
         
         // --- D. 合成 ---
-        tor_final = tor_vib + tor_damp + tor_wall ;
+        tor_final = tor_vib + tor_res + tor_damp + tor_wall ;
         
         // --- E. 限幅 ---
         if (tor_final > MAX_TORQUE)  tor_final = MAX_TORQUE;
@@ -354,7 +381,7 @@ int main(void)
             // 每个电机发完歇 1ms，防止 CAN 拥堵
         HAL_Delay(1); 
 	/************用来打印加速度的***************
-    if (update_counter >= 3) 
+    if (update_counter >= 10) 
     {
             update_counter = 0;
 
@@ -367,7 +394,7 @@ int main(void)
     *************************************/
 
 
-/**********************调试用的打印***************
+
     // --- 打印逻辑 (略微降频，只打印 Motor1 和 Acc 作参考，防止刷屏太快) ---
     if (update_counter >= 10) 
     {
@@ -393,7 +420,7 @@ sprintf(print_buf,
         HAL_UART_Transmit(&huart10, (uint8_t*)print_buf, strlen(print_buf), 50);
 			
     } 
-************************/    
+ 
       
   }
   /* USER CODE END 3 */

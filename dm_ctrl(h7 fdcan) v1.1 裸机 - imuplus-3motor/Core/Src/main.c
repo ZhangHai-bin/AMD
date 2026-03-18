@@ -57,9 +57,9 @@ volatile uint32_t update_counter = 0;
 uint32_t print_index = 0;
 
 // 加速度滤波系数：越小越平滑
-const float ACC_ALPHA[3] = {0.0f, 0.0f, 0.50f};
+const float ACC_ALPHA[3] = {0.0f, 0.50f, 0.50f};
 // 残余振动记忆系数：越接近1，记忆越久
-const float RES_ALPHA[3] = {0.0f, 0.0f, 0.5f};
+const float RES_ALPHA[3] = {0.0f, 0.5f, 0.5f};
 
 // --- 多电机管理数组 ---
 // 下标0->Motor1(X), 下标1->Motor2(Y), 下标2->Motor3(Z)
@@ -69,9 +69,9 @@ volatile float Motor_Show_Pos[4]    = {0.0f};
 
 // --- 参数设置 (数组化，方便三轴独立调试) ---
 // 建议调试顺序：先调X，把Y/Z的KP设为0；然后调Y...
-double Kp_Vib[3] = {0, 0, -0.06}; // 三轴抑振力度 double Kp_Vib[3] = {-0.07, -0.07, -0.07};
-double Kv_damp[3] = {0.0,0.0,0.002f};//double Kv_damp[3] = {0.005f,0.005f,0.005f};
-double Kr_Res[3]     = {0.0, 0.0, -0.03};   // 残余振动项-0.08
+double Kp_Vib[3] = {0, -0.06, -0.06}; // 三轴抑振力度 double Kp_Vib[3] = {0, -0.06, -0.06};
+double Kv_damp[3] = {0.0,0.002,0.002f};// 质量块速度阻尼 double Kv_damp[3] = {0.0,0.002,0.002f};
+double Kr_Res[3]     = {0.0, -0.06, -0.03};   // 残余振动项 double Kr_Res[3]     = {0.0, -0.03, -0.03}; 
 float kr_acc_start = 0.5f;
 
 	// 软限位范围 (虚拟墙开始介入的位置)

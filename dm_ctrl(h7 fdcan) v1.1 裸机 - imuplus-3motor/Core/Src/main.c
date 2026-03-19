@@ -57,9 +57,9 @@ volatile uint32_t update_counter = 0;
 uint32_t print_index = 0;
 
 // 加速度滤波系数：越小越平滑
-const float ACC_ALPHA[3] = {0.5f, 0.50f, 0.50f};
+const float ACC_ALPHA[3] = {0.0f, 0.0f, 0.0f};
 // 残余振动记忆系数：越接近1，记忆越久
-const float RES_ALPHA[3] = {0.5f, 0.5f, 0.5f};
+const float RES_ALPHA[3] = {0.0f, 0.0f, 0.0f};
 
 // --- 多电机管理数组 ---
 // 下标0->Motor1(X), 下标1->Motor2(Y), 下标2->Motor3(Z)
@@ -69,16 +69,16 @@ volatile float Motor_Show_Pos[4]    = {0.0f};
 
 // --- 参数设置 (数组化，方便三轴独立调试) ---
 // 建议调试顺序：先调X，把Y/Z的KP设为0；然后调Y...
-double Kp_Vib[3] = {-0.1, -0.1, -0.1}; // 三轴抑振力度 double Kp_Vib[3] = {0, -0.06, -0.06};
-double Kv_damp[3] = {0.003f,0.003f,0.003f};// 质量块速度阻尼 double Kv_damp[3] = {0.0,0.002,0.002f};
-double Kr_Res[3]     = {-0.06, -0.06, -0.06};   // 残余振动项 double Kr_Res[3]     = {0.0, -0.03, -0.03}; 
-float kr_acc_start = 0.5f;
+double Kp_Vib[3] = {-0.00, -0.00, -0.00}; // 三轴抑振力度 double Kp_Vib[3] = {-0.07, -0.06, -0.06};
+double Kv_damp[3] = {0.00f,0.000f,0.00f};// 质量块速度阻尼 double Kv_damp[3] = {0.0,0.002,0.002f};
+double Kr_Res[3]     = {-0.0, -0.0,-0.0};   // 残余振动项 double Kr_Res[3]     = {0.0, -0.03, -0.03}; 
+float kr_acc_start = 0.0f;// 加速度阈值，超过后不启用残余振动补偿
 
 	// 软限位范围 (虚拟墙开始介入的位置)
-const float SOFT_LIMIT_RAD[3] = {1.5f, 1.5f, 1.5f}; //const float SOFT_LIMIT_RAD[3] = {1.5f, 1.5f, 1.5f};
+const float SOFT_LIMIT_RAD[3] = {0.00f, 0.00f, 0.00}; //const float SOFT_LIMIT_RAD[3] = {1.5f, 1.5f, 1.5f};
 
 // 虚拟墙参数
-const float WALL_K_SPRING[3]  = {0.03f, 0.03f, 0.03f};//const float WALL_K_SPRING[3]  = {0.03f, 0.01f, 0.01f};
+const float WALL_K_SPRING[3]  = {0.00f, 0.00f, 0.00f};//const float WALL_K_SPRING[3]  = {0.03f, 0.01f, 0.01f};
 
 // 物理最大力矩保护
 const float MAX_TORQUE = 1.0f;   
@@ -396,30 +396,20 @@ int main(void)
 
 
     // --- 打印逻辑 (略微降频，只打印 Motor1 和 Acc 作参考，防止刷屏太快) ---
+    // --- 打印三轴加速度：序号,ax,ay,az ---
     if (update_counter >= 10) 
     {
         update_counter = 0;
         char print_buf[128];
-			
-sprintf(print_buf, 
-        "=== 三轴完整数据 ===\r\n"
-        "X轴: Pos=%.3f | Zero=%.3f | Show_cur=%.3f | Tor=%.3f | Acc=%.3f\r\n"
-        "Y轴: Pos=%.3f | Zero=%.3f | Show_cur=%.3f | Tor=%.3f | Acc=%.3f\r\n"
-        "Z轴: Pos=%.3f | Zero=%.3f | Show_cur=%.3f | Tor=%.3f | Acc=%.3f\r\n"
-        "=====================\r\n",
-        // X轴
-        motor[Motor1].para.pos, Motor_Zero_Offset[Motor1], Motor_Show_Pos[Motor1],
-        motor[Motor1].ctrl.tor_set, linear_acc[0],
-        // Y轴
-        motor[Motor2].para.pos, Motor_Zero_Offset[Motor2], Motor_Show_Pos[Motor2],
-        motor[Motor2].ctrl.tor_set, linear_acc[1],
-        // Z轴
-        motor[Motor3].para.pos, Motor_Zero_Offset[Motor3], Motor_Show_Pos[Motor3],
-        motor[Motor3].ctrl.tor_set, linear_acc[2]);
-        
+
+        sprintf(print_buf, "%lu,%.6f,%.6f,%.6f\r\n",
+                ++print_index,
+                linear_acc[0],
+                linear_acc[1],
+                linear_acc[2]);
+
         HAL_UART_Transmit(&huart10, (uint8_t*)print_buf, strlen(print_buf), 50);
-			
-    } 
+    }
  
       
   }

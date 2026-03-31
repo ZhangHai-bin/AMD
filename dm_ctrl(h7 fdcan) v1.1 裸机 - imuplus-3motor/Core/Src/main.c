@@ -50,14 +50,14 @@ volatile float acc[3];        // 原始加速度 (含重力)
 volatile float angle[3];      // 角度 (Roll, Pitch, Yaw)
 volatile float linear_acc[3]; // 纯运动加速度 (去除重力)
 volatile float linear_acc_filt[3] = {0.0f};
-volatile float residual_acc[3]    = {0.0f};
+volatile float residual_acc[3]    = {0.0f}; 
 
 // 计数器
 volatile uint32_t update_counter = 0;
 uint32_t print_index = 0;
 
 // 加速度滤波系数：越小越平滑
-const float ACC_ALPHA[3] = {0.1f, 0.50f, 0.50f};
+const float ACC_ALPHA[3] = {0.01f, 0.50f, 0.50f};
 // 残余振动记忆系数：越接近1，记忆越久
 const float RES_ALPHA[3] = {0.5f, 0.5f, 0.5f};
 
@@ -72,8 +72,8 @@ volatile float Motor_Show_Pos[4]    = {0.0f};
 // 建议调试顺序：先调X，把Y/Z的KP设为0；然后调Y...
 double Kp_Vib[3] = {0.0, 0, 0.0}; // 三轴抑振力度 double Kp_Vib[3] = {-0.5, 0.06, -0.06};
 double Kv_damp[3] = {0.00f,0.00f,0.000f};// 质量块速度阻尼 double Kv_damp[3] = {0.0,0.002,0.002f};
-double Kr_Res[3]     = {0.0, 0.3, -0.00};   // 残余振动项 double Kr_Res[3]     = {0.0, -0.03, -0.03}; 
-float kr_acc_start = 0.125f;
+double Kr_Res[3]     = {0.0, 0.6, -0.00};   // 残余振动项 double Kr_Res[3]     = {0.0, -0.3, -0.03}; 
+float kr_acc_start = 0.125f; //参与振动开始加速度，低于这个加速度值才开始彩玉振动抑制
 
 	// 软限位范围 (虚拟墙开始介入的位置)
 const float SOFT_LIMIT_RAD[3] = {1.5f, 1.5f, 1.5f}; //const float SOFT_LIMIT_RAD[3] = {1.5f, 1.5f, 1.5f};
@@ -304,7 +304,10 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-        
+        // 使能三个电机
+    dm_motor_enable(&hfdcan1, &motor[Motor1]); 
+    dm_motor_enable(&hfdcan1, &motor[Motor2]); 
+    dm_motor_enable(&hfdcan1, &motor[Motor3]);    
 
     // ============================================
     // === 循环处理 3 个轴 (i=0:X, i=1:Y, i=2:Z) ===

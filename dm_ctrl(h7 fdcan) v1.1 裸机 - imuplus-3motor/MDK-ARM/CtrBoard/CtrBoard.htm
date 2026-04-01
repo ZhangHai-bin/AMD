@@ -3,7 +3,7 @@
 <title>Static Call Graph - [CtrBoard\CtrBoard.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image CtrBoard\CtrBoard.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Thu Mar 26 11:55:26 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Wed Apr 01 21:21:10 2026
 <BR><P>
 <H3>Maximum Stack Usage =        640 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -911,8 +911,8 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 400<LI>Call Chain = HAL_FDCAN_Init &rArr; HAL_FDCAN_MspInit &rArr; HAL_RCCEx_PeriphCLKConfig &rArr; RCCEx_PLL3_Config
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ca]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_FDCAN_MspInit
-<LI><a href="#[cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FDCAN_CalcultateRamBlockAddresses
 <LI><a href="#[b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GetTick
+<LI><a href="#[cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FDCAN_CalcultateRamBlockAddresses
 <LI><a href="#[c9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memcpy4
 </UL>
 <BR>[Called By]<UL><LI><a href="#[12e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;bsp_fdcan_set_baud
@@ -1797,7 +1797,7 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[134]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mit_ctrl
 </UL>
 
-<P><STRONG><a name="[93]"></a>main</STRONG> (Thumb, 822 bytes, Stack size 200 bytes, main.o(i.main))
+<P><STRONG><a name="[93]"></a>main</STRONG> (Thumb, 836 bytes, Stack size 200 bytes, main.o(i.main))
 <BR><BR>[Stack]<UL><LI>Max Depth = 640<LI>Call Chain = main &rArr; bsp_fdcan_set_baud &rArr; HAL_FDCAN_Init &rArr; HAL_FDCAN_MspInit &rArr; HAL_RCCEx_PeriphCLKConfig &rArr; RCCEx_PLL3_Config
 </UL>
 <BR>[Calls]<UL><LI><a href="#[13a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dm_motor_init

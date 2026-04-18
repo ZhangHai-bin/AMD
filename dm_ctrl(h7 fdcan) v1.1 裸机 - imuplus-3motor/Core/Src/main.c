@@ -57,9 +57,9 @@
     uint32_t print_index = 0;
 
     // 加速度滤波系数：越小越平滑
-    const float ACC_ALPHA[3] = {0.5f, 0.50f, 0.50f};
+    const float ACC_ALPHA[3] = {1.0f, 0.50f, 0.50f};
     // 残余振动记忆系数：越接近1，记忆越久
-    const float RES_ALPHA[3] = {0.5f, 0.5f, 0.5f};
+    const float RES_ALPHA[3] = {0.0f, 0.5f, 0.5f};
 
     // --- 多电机管理数组 ---
     
@@ -70,18 +70,18 @@
 
     // --- 参数设置 (数组化，方便三轴独立调试) ---
     // 建议调试顺序：先调X，把Y/Z的KP设为0；然后调Y...
-    double Kp_Vib[3] = {0.0, 0, 0.0}; // 三轴抑振力度 double Kp_Vib[3] = {-0.5, 0.06, -0.06};
-    double Kv_damp[3] = {0.00f,0.00f,0.000f};// 质量块速度阻尼 double Kv_damp[3] = {0.0,0.002,0.002f};
-    double Kr_Res[3]     = {-0.6, 0.0, -0.00};   // 残余振动项 double Kr_Res[3]     = {0.0, -0.3, -0.03}; 
-    float kr_acc_start = 0.125f; //参与振动开始加速度，低于这个加速度值才开始彩玉振动抑制
+    double Kp_Vib[3] = {-0.125, 0, 0.0}; // 三轴抑振力度 double Kp_Vib[3] = {-0.5, 0.06, -0.06};
+    double Kv_damp[3] = {0.0f,0.00f,0.000f};// 质量块速度阻尼 double Kv_damp[3] = {0.0,0.002,0.002f};
+    double Kr_Res[3]     = {-0.6, 0.0, -0.00};   // 残余振动项 double Kr_Res[3]     = {-0.6, 0.6, 0}; 
+    float kr_acc_start = 0.125f; //参与振动开始加速度，低于这个加速度值才开始振动抑制
     // 恒定力矩补偿（主要给X方向抗重力）
-    double Torque_Bias[3] = {0.02, 0.0, 0.0};
+    double Torque_Bias[3] = {0.00, 0.0, 0.0};
 
         // 软限位范围 (虚拟墙开始介入的位置)
-    const float SOFT_LIMIT_RAD[3] = {1.5f, 1.5f, 1.5f}; //const float SOFT_LIMIT_RAD[3] = {1.5f, 1.5f, 1.5f};
+    const float SOFT_LIMIT_RAD[3] = {1.5f, 1.5f, 1.5f};  //const float SOFT_LIMIT_RAD[3] = {1.5f, 1.5f, 1.5f};
 
     // 虚拟墙参数
-    const float WALL_K_SPRING[3]  = {0.00f, 0.03f, 0.03f};//const float WALL_K_SPRING[3]  = {0.03f, 0.01f, 0.01f};
+    const float WALL_K_SPRING[3]  = {0.0f, 0.03f, 0.03f};//const float WALL_K_SPRING[3]  = {0.03f, 0.01f, 0.01f};
 
     // 物理最大力矩保护
     const float MAX_TORQUE = 1.0f;   
@@ -331,8 +331,8 @@
             float cur_pos = Motor_Show_Pos[i];
             float cur_vel = motor[i].para.vel;
             float tor_final = 0.0f;
-
-            float tor_vib = Kp_Vib[i] * linear_acc_filt[i];// 当前快速响应 Kp_Vib[i] * linear_acc[i]
+            float tor_vib = 0.0f;    
+            //float tor_vib = Kp_Vib[i] * linear_acc_filt[i];// 当前快速响应 Kp_Vib[i] * linear_acc[i]
             float tor_damp = -Kv_damp[i] * cur_vel;// 电机质量块自身阻尼
         
             float tor_res = 0.0f;
@@ -341,7 +341,13 @@
             if (fabsf(linear_acc_filt[i]) < kr_acc_start)
             {
                 //tor_res = Kr_Res[i] * residual_acc[i];
-                            tor_res = Kr_Res[i] * linear_acc_filt[i];						
+                tor_res = Kr_Res[i] * linear_acc_filt[i];
+                tor_vib = 0.0f;						
+            }
+            else
+            {
+                tor_res = 0.0f;
+                tor_vib = Kp_Vib[i] * linear_acc_filt[i];
             }
 
             // --- C. 虚拟墙力矩 ---

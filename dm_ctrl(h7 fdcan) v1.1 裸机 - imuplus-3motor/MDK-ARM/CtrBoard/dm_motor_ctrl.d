@@ -8,7 +8,7 @@ ctrboard\dm_motor_ctrl.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.
 ctrboard\dm_motor_ctrl.o: ../Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7xx.h
 ctrboard\dm_motor_ctrl.o: ../Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h723xx.h
 ctrboard\dm_motor_ctrl.o: ../Drivers/CMSIS/Include/core_cm7.h
-ctrboard\dm_motor_ctrl.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stdint.h
+ctrboard\dm_motor_ctrl.o: E:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 ctrboard\dm_motor_ctrl.o: ../Drivers/CMSIS/Include/cmsis_version.h
 ctrboard\dm_motor_ctrl.o: ../Drivers/CMSIS/Include/cmsis_compiler.h
 ctrboard\dm_motor_ctrl.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
@@ -16,8 +16,8 @@ ctrboard\dm_motor_ctrl.o: ../Drivers/CMSIS/Include/mpu_armv7.h
 ctrboard\dm_motor_ctrl.o: ../Drivers/CMSIS/Device/ST/STM32H7xx/Include/system_stm32h7xx.h
 ctrboard\dm_motor_ctrl.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h
 ctrboard\dm_motor_ctrl.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h
-ctrboard\dm_motor_ctrl.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stddef.h
-ctrboard\dm_motor_ctrl.o: F:\Keil5\ARM\ARMCC\Bin\..\include\math.h
+ctrboard\dm_motor_ctrl.o: E:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+ctrboard\dm_motor_ctrl.o: E:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 ctrboard\dm_motor_ctrl.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc_ex.h
 ctrboard\dm_motor_ctrl.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_gpio.h
 ctrboard\dm_motor_ctrl.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_gpio_ex.h
@@ -41,5 +41,5 @@ ctrboard\dm_motor_ctrl.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart
 ctrboard\dm_motor_ctrl.o: ../Core/Inc/fdcan.h
 ctrboard\dm_motor_ctrl.o: ..\User\bsp_fdcan.h
 ctrboard\dm_motor_ctrl.o: ..\User\dm_motor_ctrl.h
-ctrboard\dm_motor_ctrl.o: F:\Keil5\ARM\ARMCC\Bin\..\include\string.h
-ctrboard\dm_motor_ctrl.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stdbool.h
+ctrboard\dm_motor_ctrl.o: E:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+ctrboard\dm_motor_ctrl.o: E:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
